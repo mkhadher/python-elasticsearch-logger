@@ -1,28 +1,16 @@
-
-==============
-PYESHandler.py
-==============
-
-|  |license| |versions| |status| |downloads|
-|  |ci_status| |codecov|
-
-
 Python Elasticsearch Log handler
 ********************************
+This library provides an Elasticsearch logging appender compatible with the python standard `logging <https://docs.python.org/2/library/logging.html>`_ library.
 
-This library provides an Elasticsearch logging appender compatible with the
-python standard `logging <https://docs.python.org/2/library/logging.html>`_ library.
+This library is a fork of `https://github.com/cmanaha/python-elasticsearch-logger <https://github.com/cmanaha/python-elasticsearch-logger>`_ Thanks to Carlos Manzanedo Rueda for starting this library.
 
-This library is a fork of `https://github.com/cmanaha/python-elasticsearch-logger
-<https://github.com/cmanaha/python-elasticsearch-logger>`_ Thanks to Carlos Manzanedo Rueda for starting this library.
-
-The code source is in github at `https://github.com/mkhadher/python-elasticsearch-logger
-<https://github.com/mkhadher/python-elasticsearch-logger>`_
-
+The code source is in github at `https://github.com/mkhadher/python-elasticsearch-logger <https://github.com/mkhadher/python-elasticsearch-logger>`_
 
 Installation
 ============
-Install using pip::
+Install using pip
+
+.. code-block::
 
     pip install PYESHandler
 
@@ -32,7 +20,6 @@ This library requires the following dependencies
  - elasticsearch
  - requests
  - enum
-
 
 Requirements Python 3
 =====================
@@ -237,22 +224,3 @@ Contributing back
 -----------------
 Feel free to use this as is or even better, feel free to fork and send your pull requests over.
 
-
-.. |downloads| image:: https://img.shields.io/pypi/dd/PYESHandler.svg
-    :target: https://pypi.python.org/pypi/PYESHandler
-    :alt: Daily PyPI downloads
-.. |versions| image:: https://img.shields.io/pypi/pyversions/PYESHandler.svg
-    :target: https://pypi.python.org/pypi/PYESHandler
-    :alt: Python versions supported
-.. |status| image:: https://img.shields.io/pypi/status/PYESHandler.svg
-    :target: https://pypi.python.org/pypi/PYESHandler
-    :alt: Package stability
-.. |license| image:: https://img.shields.io/pypi/l/PYESHandler.svg
-    :target: https://pypi.python.org/pypi/PYESHandler
-    :alt: License
-.. |ci_status| image:: https://travis-ci.com/mkhadher/python-elasticsearch-logger.svg?branch=master
-    :target: https://travis-ci.org/mkhadher/python-elasticsearch-logger
-    :alt: Continuous Integration Status
-.. |codecov| image:: https://codecov.io/github/mkhadher/python-elasticsearch-logger/coverage.svg?branch=master
-    :target: http://codecov.io/github/mkhadher/python-elasticsearch-logger?branch=master
-    :alt: Coverage!
