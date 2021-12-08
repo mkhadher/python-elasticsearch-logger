@@ -29,22 +29,22 @@ if sys.version_info <= (3,4):
 print("List of dependencies : {0}".format(str(dependencies)))
 
 setup(
-    name='CMRESHandler',
+    name='PYESHandler',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0',
+    version='1.0.1',
 
     description='Elasticsearch Log handler for the logging library',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/cmanaha/python-elasticsearch-logger',
+    url='https://github.com/mkhadher/python-elasticsearch-logger',
 
     # Author details
-    author='Carlos Manzanedo Rueda',
-    author_email='c.manaha@gmail.com',
+    author='Mohammed Mousa',
+    author_email='m.khadher@hotmail.com',
 
     # Choose your license
     license='Apache2',
@@ -68,11 +68,11 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.8',
     ],
 
     # What does your project relate to?
-    keywords='logging elasticsearch handler log django instrumentation',
+    keywords='logging elasticsearch handler log django and flask instrumentation',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().

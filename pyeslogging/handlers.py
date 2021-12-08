@@ -11,9 +11,9 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 try:
     from requests_kerberos import HTTPKerberosAuth, DISABLED
-    CMR_KERBEROS_SUPPORTED = True
+    KERBEROS_SUPPORTED = True
 except ImportError:
-    CMR_KERBEROS_SUPPORTED = False
+    KERBEROS_SUPPORTED = False
 
 try:
     from requests_aws4auth import AWS4Auth
@@ -21,10 +21,10 @@ try:
 except ImportError:
     AWS4AUTH_SUPPORTED = False
 
-from cmreslogging.serializers import CMRESSerializer
+from pyeslogging.serializers import PYESSerializer
 
 
-class CMRESHandler(logging.Handler):
+class PYESHandler(logging.Handler):
     """ Elasticsearch log handler
 
     Allows to log to elasticsearch into json format.
@@ -51,11 +51,13 @@ class CMRESHandler(logging.Handler):
         - Weekly indices
         - Monthly indices
         - Year indices
+        - Never expiring indices
         """
         DAILY = 0
         WEEKLY = 1
         MONTHLY = 2
         YEARLY = 3
+        NEVER = 4
 
     # Defaults for the class
     __DEFAULT_ELASTICSEARCH_HOST = [{'host': 'localhost', 'port': 9200}]
@@ -115,11 +117,25 @@ class CMRESHandler(logging.Handler):
         """
         return "{0!s}-{1!s}".format(es_index_name, datetime.datetime.now().strftime('%Y'))
 
+    @staticmethod
+    def _get_never_index_name(es_index_name):
+        """ Return elasticsearch index name
+        :param: index_name the prefix to be used in the index
+        :return: A srting containing the elasticsearch indexname used which should include just the index name
+        """
+        return "{0!s}".format(es_index_name)
+
     _INDEX_FREQUENCY_FUNCION_DICT = {
         IndexNameFrequency.DAILY: _get_daily_index_name,
         IndexNameFrequency.WEEKLY: _get_weekly_index_name,
         IndexNameFrequency.MONTHLY: _get_monthly_index_name,
-        IndexNameFrequency.YEARLY: _get_yearly_index_name
+        IndexNameFrequency.YEARLY: _get_yearly_index_name,
+        IndexNameFrequency.NEVER: _get_never_index_name,
+        "daily": _get_daily_index_name,
+        "weekly": _get_weekly_index_name,
+        "monthly": _get_monthly_index_name,
+        "yearly": _get_yearly_index_name,
+        "never": _get_never_index_name
     }
 
     def __init__(self,
@@ -144,17 +160,18 @@ class CMRESHandler(logging.Handler):
         :param hosts: The list of hosts that elasticsearch clients will connect. The list can be provided
                     in the format ```[{'host':'host1','port':9200}, {'host':'host2','port':9200}]``` to
                     make sure the client supports failover of one of the instertion nodes
-        :param auth_details: When ```CMRESHandler.AuthType.BASIC_AUTH``` is used this argument must contain
-                    a tuple of string with the user and password that will be used to authenticate against
-                    the Elasticsearch servers, for example```('User','Password')
-        :param aws_access_key: When ```CMRESHandler.AuthType.AWS_SIGNED_AUTH``` is used this argument must contain
-                    the AWS key id of the  the AWS IAM user
-        :param aws_secret_key: When ```CMRESHandler.AuthType.AWS_SIGNED_AUTH``` is used this argument must contain
-                    the AWS secret key of the  the AWS IAM user
-        :param aws_region: When ```CMRESHandler.AuthType.AWS_SIGNED_AUTH``` is used this argument must contain
-                    the AWS region of the  the AWS Elasticsearch servers, for example```'us-east'
-        :param auth_type: The authentication type to be used in the connection ```CMRESHandler.AuthType```
-                    Currently, NO_AUTH, BASIC_AUTH, KERBEROS_AUTH are supported
+        :param auth_details: When ```PYESHandler.AuthType.BASIC_AUTH``` object or "BASIC_AUTH" string is used this
+                    argument must contain a tuple of string with the user and password that will be used to authenticate
+                     against the Elasticsearch servers or you can use a dictionary
+                     {"username": "my_username","password": "my_fancy_password"}
+        :param aws_access_key: When ```PYESHandler.AuthType.AWS_SIGNED_AUTH``` or "AWS_SIGNED_AUTH" string is used this
+                    argument must contain the AWS key id of the  the AWS IAM user
+        :param aws_secret_key: When ```PYESHandler.AuthType.AWS_SIGNED_AUTH``` or "AWS_SIGNED_AUTH" string is used
+                    this argument must contain the AWS secret key of the  the AWS IAM user
+        :param aws_region: When ```PYESHandler.AuthType.AWS_SIGNED_AUTH``` or "AWS_SIGNED_AUTH" string is used this
+                    argument must contain the AWS region of the  the AWS Elasticsearch servers, for example```'us-east'
+        :param auth_type: The authentication type to be used in the connection ```PYESHandler.AuthType```
+                    Currently, "NO_AUTH", "BASIC_AUTH", "KERBEROS_AUTH" are supported
         :param use_ssl: A boolean that defines if the communications should use SSL encrypted communication
         :param verify_ssl: A boolean that defines if the SSL certificates are validated or not
         :param buffer_size: An int, Once this size is reached on the internal buffer results are flushed into ES
@@ -164,7 +181,8 @@ class CMRESHandler(logging.Handler):
                     date with YYYY.MM.dd, ```python_logger``` used by default
         :param index_name_frequency: Defines what the date used in the postfix of the name would be. available values
                     are selected from the IndexNameFrequency class (IndexNameFrequency.DAILY,
-                    IndexNameFrequency.WEEKLY, IndexNameFrequency.MONTHLY, IndexNameFrequency.YEARLY). By default
+                    IndexNameFrequency.WEEKLY, IndexNameFrequency.MONTHLY, IndexNameFrequency.YEARLY,
+                    IndexNameFrequency.NEVER). By default
                     it uses daily indices.
         :param es_doc_type: A string with the name of the document type that will be used ```python_log``` used
                     by default
@@ -172,7 +190,7 @@ class CMRESHandler(logging.Handler):
                     to the logs, such the application, environment, etc.
         :param raise_on_indexing_exceptions: A boolean, True only for debugging purposes to raise exceptions
                     caused when
-        :return: A ready to be used CMRESHandler.
+        :return: A ready to be used PYESHandler.
         """
         logging.Handler.__init__(self)
 
@@ -199,8 +217,8 @@ class CMRESHandler(logging.Handler):
         self._buffer = []
         self._buffer_lock = Lock()
         self._timer = None
-        self._index_name_func = CMRESHandler._INDEX_FREQUENCY_FUNCION_DICT[self.index_name_frequency]
-        self.serializer = CMRESSerializer()
+        self._index_name_func = PYESHandler._INDEX_FREQUENCY_FUNCION_DICT[self.index_name_frequency]
+        self.serializer = PYESSerializer()
 
     def __schedule_flush(self):
         if self._timer is None:
@@ -209,7 +227,8 @@ class CMRESHandler(logging.Handler):
             self._timer.start()
 
     def __get_es_client(self):
-        if self.auth_type == CMRESHandler.AuthType.NO_AUTH:
+        if self.auth_type == PYESHandler.AuthType.NO_AUTH or self.auth_type == "NO_AUTH":
+            self.auth_type = PYESHandler.AuthType.NO_AUTH
             if self._client is None:
                 self._client = Elasticsearch(hosts=self.hosts,
                                              use_ssl=self.use_ssl,
@@ -218,8 +237,17 @@ class CMRESHandler(logging.Handler):
                                              serializer=self.serializer)
             return self._client
 
-        if self.auth_type == CMRESHandler.AuthType.BASIC_AUTH:
+        if self.auth_type == PYESHandler.AuthType.BASIC_AUTH or self.auth_type == "BASIC_AUTH":
+            auth_type = PYESHandler.AuthType.BASIC_AUTH
             if self._client is None:
+
+                if isinstance(self.auth_details, tuple) :
+                    pass
+                elif isinstance(self.auth_details, dict) :
+                    self.auth_details = (self.auth_details['username'], self.auth_details['password'])
+                else:
+                    raise TypeError("auth_details ({0}) type is not supported, only tuple and dict are supported".format(type(self.auth_details)))
+
                 return Elasticsearch(hosts=self.hosts,
                                      http_auth=self.auth_details,
                                      use_ssl=self.use_ssl,
@@ -228,8 +256,9 @@ class CMRESHandler(logging.Handler):
                                      serializer=self.serializer)
             return self._client
 
-        if self.auth_type == CMRESHandler.AuthType.KERBEROS_AUTH:
-            if not CMR_KERBEROS_SUPPORTED:
+        if self.auth_type == PYESHandler.AuthType.KERBEROS_AUTH or self.auth_type == "KERBEROS_AUTH":
+            self.auth_type = PYESHandler.AuthType.KERBEROS_AUTH
+            if not KERBEROS_SUPPORTED:
                 raise EnvironmentError("Kerberos module not available. Please install \"requests-kerberos\"")
             # For kerberos we return a new client each time to make sure the tokens are up to date
             return Elasticsearch(hosts=self.hosts,
@@ -239,7 +268,8 @@ class CMRESHandler(logging.Handler):
                                  http_auth=HTTPKerberosAuth(mutual_authentication=DISABLED),
                                  serializer=self.serializer)
 
-        if self.auth_type == CMRESHandler.AuthType.AWS_SIGNED_AUTH:
+        if self.auth_type == PYESHandler.AuthType.AWS_SIGNED_AUTH or self.auth_type == "KERBEROS_AUTH":
+            self.auth_type = PYESHandler.AuthType.AWS_SIGNED_AUTH
             if not AWS4AUTH_SUPPORTED:
                 raise EnvironmentError("AWS4Auth not available. Please install \"requests-aws4auth\"")
             if self._client is None:
@@ -292,7 +322,6 @@ class CMRESHandler(logging.Handler):
                 actions = (
                     {
                         '_index': self._index_name_func.__func__(self.es_index_name),
-                        '_type': self.es_doc_type,
                         '_source': log_record
                     }
                     for log_record in logs_buffer
@@ -327,7 +356,7 @@ class CMRESHandler(logging.Handler):
 
         rec = self.es_additional_fields.copy()
         for key, value in record.__dict__.items():
-            if key not in CMRESHandler.__LOGGING_FILTER_FIELDS:
+            if key not in PYESHandler.__LOGGING_FILTER_FIELDS:
                 if key == "args":
                     value = tuple(str(arg) for arg in value)
                 rec[key] = "" if value is None else value

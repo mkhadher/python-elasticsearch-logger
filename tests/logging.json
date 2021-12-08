@@ -1,0 +1,38 @@
+{
+   "version":1,
+   "disable_existing_loggers":true,
+   "formatters":{
+      "standard":{
+         "format":"%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
+      }
+   },
+   "handlers":{
+      "file":{
+         "level":"DEBUG",
+         "class":"logging.handlers.TimedRotatingFileHandler",
+         "formatter":"standard",
+         "filename":"./log_file.txt",
+         "when":"midnight",
+         "backupCount":25
+      },
+      "elasticsearch":{
+         "level":"DEBUG",
+         "class":"pyeslogging.handlers.PYESHandler",
+         "hosts": [{"host": "my.elastic.domain.com", "port": 9243}],
+         "es_index_name":"PYESLogger",
+         "auth_type": "BASIC_AUTH",
+         "auth_details": {"username": "my_username","password": "my_fancy_password"},
+         "use_ssl":true,
+         "index_name_frequency": "monthly",
+         "verify_ssl": true
+      }
+   },
+   "root":{
+      "handlers":[
+         "file",
+         "elasticsearch"
+      ],
+      "level":"DEBUG",
+      "propagate":false
+   }
+}

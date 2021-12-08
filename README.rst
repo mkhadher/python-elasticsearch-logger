@@ -1,13 +1,10 @@
 
 ===============
-CMRESHandler.py
+PYESHandler.py
 ===============
 
 |  |license| |versions| |status| |downloads|
 |  |ci_status| |codecov| |gitter|
-
-
-**Note: Maintainers needed : Those that committed in the past code to this repo or are presenting new PRs and have experience and interest on helping to maintain repos & python libraries (code quality, testing, integration, etc). If you are intereted on getting our PR's through and helping others to contribute to the library, please get in touch.**
 
 
 Python Elasticsearch Log handler
@@ -16,15 +13,18 @@ Python Elasticsearch Log handler
 This library provides an Elasticsearch logging appender compatible with the
 python standard `logging <https://docs.python.org/2/library/logging.html>`_ library.
 
-The code source is in github at `https://github.com/cmanaha/python-elasticsearch-logger
-<https://github.com/cmanaha/python-elasticsearch-logger>`_
+This library is a fork of `https://github.com/cmanaha/python-elasticsearch-logger
+<https://github.com/cmanaha/python-elasticsearch-logger>`_ Thanks to Carlos Manzanedo Rueda for starting this library.
+
+The code source is in github at `https://github.com/mkhadher/python-elasticsearch-logger
+<https://github.com/mkhadher/python-elasticsearch-logger>`_
 
 
 Installation
 ============
 Install using pip::
 
-    pip install CMRESHandler
+    pip install PYESHandler
 
 Requirements Python 2
 =====================
@@ -54,9 +54,9 @@ Using the handler in  your program
 ==================================
 To initialise and create the handler, just add the handler to your logger as follow ::
 
-    from cmreslogging.handlers import CMRESHandler
-    handler = CMRESHandler(hosts=[{'host': 'localhost', 'port': 9200}],
-                               auth_type=CMRESHandler.AuthType.NO_AUTH,
+    from pyeslogging.handlers import PYESHandler
+    handler = PYESHandler(hosts=[{'host': 'localhost', 'port': 9200}],
+                               auth_type=PYESHandler.AuthType.NO_AUTH,
                                es_index_name="my_python_index")
     log = logging.getLogger("PythonTest")
     log.setLevel(logging.INFO)
@@ -64,9 +64,9 @@ To initialise and create the handler, just add the handler to your logger as fol
 
 You can add fields upon initialisation, providing more data of the execution context ::
 
-    from cmreslogging.handlers import CMRESHandler
-    handler = CMRESHandler(hosts=[{'host': 'localhost', 'port': 9200}],
-                               auth_type=CMRESHandler.AuthType.NO_AUTH,
+    from pyeslogging.handlers import PYESHandler
+    handler = PYESHandler(hosts=[{'host': 'localhost', 'port': 9200}],
+                               auth_type=PYESHandler.AuthType.NO_AUTH,
                                es_index_name="my_python_index",
                                es_additional_fields={'App': 'MyAppName', 'Environment': 'Dev'})
     log = logging.getLogger("PythonTest")
@@ -100,11 +100,10 @@ The constructors takes the following parameters:
     [{'host':'host1','port':9200}, {'host':'host2','port':9200}]
 
 
- - auth_type: The authentication currently support CMRESHandler.AuthType = NO_AUTH, BASIC_AUTH, KERBEROS_AUTH
- - auth_details: When CMRESHandler.AuthType.BASIC_AUTH is used this argument must contain a tuple of string with the user and password that will be used to authenticate against the Elasticsearch servers, for example ('User','Password')
- - aws_access_key: When ``CMRESHandler.AuthType.AWS_SIGNED_AUTH`` is used this argument must contain the AWS key id of the  the AWS IAM user
- - aws_secret_key: When ``CMRESHandler.AuthType.AWS_SIGNED_AUTH`` is used this argument must contain the AWS secret key of the  the AWS IAM user
- - aws_region: When ``CMRESHandler.AuthType.AWS_SIGNED_AUTH`` is used this argument must contain the AWS region of the  the AWS Elasticsearch servers, for example ``'us-east'``
+ - auth_type: The authentication currently support PYESHandler.AuthType = NO_AUTH, BASIC_AUTH, KERBEROS_AUTH
+ - auth_details: When PYESHandler.AuthType.BASIC_AUTH or "BASIC_AUTH" string is used this argument must contain a tuple of string with the user and password that will be used to authenticate against the Elasticsearch servers, for example a tuple  ('User','Password') or a dictionary {"username": "my_username","password": "my_fancy_password"}
+ - aws_secret_key: When ``PYESHandler.AuthType.AWS_SIGNED_AUTH`` or "AWS_SIGNED_AUTH" string is used this argument must contain the AWS secret key of the  the AWS IAM user
+ - aws_region: When ``PYESHandler.AuthType.AWS_SIGNED_AUTH`` or "AWS_SIGNED_AUTH" string is used this argument must contain the AWS region of the  the AWS Elasticsearch servers, for example ``'us-east'``
  - use_ssl: A boolean that defines if the communications should use SSL encrypted communication
  - verify_ssl: A boolean that defines if the SSL certificates are validated or not
  - buffer_size: An int, Once this size is reached on the internal buffer results are flushed into ES
@@ -112,8 +111,8 @@ The constructors takes the following parameters:
  - es_index_name: A string with the prefix of the elasticsearch index that will be created. Note a date with
    YYYY.MM.dd, ``python_logger`` used by default
  - index_name_frequency: The frequency to use as part of the index naming. Currently supports
-   CMRESHandler.IndexNameFrequency.DAILY, CMRESHandler.IndexNameFrequency.WEEKLY,
-   CMRESHandler.IndexNameFrequency.MONTHLY, CMRESHandler.IndexNameFrequency.YEARLY by default the daily rotation
+   PYESHandler.IndexNameFrequency.DAILY, PYESHandler.IndexNameFrequency.WEEKLY,
+   PYESHandler.IndexNameFrequency.MONTHLY, PYESHandler.IndexNameFrequency.YEARLY and PYESHandler.IndexNameFrequency.NEVER. By default the daily rotation
    is used
  - es_doc_type: A string with the name of the document type that will be used ``python_log`` used by default
  - es_additional_fields: A dictionary with all the additional fields that you would like to add to the logs
@@ -124,7 +123,7 @@ It is also very easy to integrate the handler to `Django <https://www.djangoproj
 better, at DEBUG level django logs information such as how long it takes for DB connections to return so
 they can be plotted on Kibana, or the SQL statements that Django executed. ::
 
-    from cmreslogging.handlers import CMRESHandler
+    from pyeslogging.handlers import PYESHandler
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -138,11 +137,11 @@ they can be plotted on Kibana, or the SQL statements that Django executed. ::
             },
             'elasticsearch': {
                 'level': 'DEBUG',
-                'class': 'cmreslogging.handlers.CMRESHandler',
+                'class': 'pyeslogging.handlers.PYESHandler',
                 'hosts': [{'host': 'localhost', 'port': 9200}],
                 'es_index_name': 'my_python_app',
                 'es_additional_fields': {'App': 'Test', 'Environment': 'Dev'},
-                'auth_type': CMRESHandler.AuthType.NO_AUTH,
+                'auth_type': PYESHandler.AuthType.NO_AUTH,
                 'use_ssl': False,
             },
         },
@@ -158,6 +157,65 @@ they can be plotted on Kibana, or the SQL statements that Django executed. ::
 There is more information about how Django logging works in the
 `Django documentation <https://docs.djangoproject.com/en/1.9/topics/logging//>`_
 
+Read logging JSON Config File
+==================
+
+The below example can be used by a flask app or any python script. This example shows how to configure logging logger for file and elasticsearch logging using logging json config file.
+
+``logging.json``
+::
+    {
+       "version":1,
+       "disable_existing_loggers":true,
+       "formatters":{
+          "standard":{
+             "format":"%(asctime)s - %(levelname)s - %(threadName)s - %(name)s - %(message)s"
+          }
+       },
+       "handlers":{
+          "file":{
+             "level":"DEBUG",
+             "class":"logging.handlers.TimedRotatingFileHandler",
+             "formatter":"standard",
+             "filename":"./log_file.txt",
+             "when":"midnight",
+             "backupCount":25
+          },
+          "elasticsearch":{
+             "level":"DEBUG",
+             "class":"pyeslogging.handlers.PYESHandler",
+             "hosts": [{"host": "my.elastic.domain.com", "port": 9243}],
+             "es_index_name":"PYESLogger",
+             "auth_type": "BASIC_AUTH",
+             "auth_details": {"username": "my_username","password": "my_fancy_password"},
+             "use_ssl":true,
+             "index_name_frequency": "monthly",
+             "verify_ssl": true
+          }
+       },
+       "root":{
+          "handlers":[
+             "file",
+             "elasticsearch"
+          ],
+          "level":"DEBUG",
+          "propagate":false
+       }
+    }
+
+``app.py``
+::
+    import logging
+    import logging.config
+    from pyeslogging.handlers import PYESHandler
+    import json
+
+    # Define logging.json path
+    with open("C:\App\logging.json") as read_file:
+        loggingConfigDir = json.load(read_file)
+    logging.config.dictConfig(loggingConfigDir)
+    logger = logging.getLogger('root')
+    logger.info("Hello World !")
 
 Building the sources & Testing
 ------------------------------
@@ -169,8 +227,6 @@ Why using an appender rather than logstash or beats
 In some cases is quite useful to provide all the information available within the LogRecords as it contains
 things such as exception information, the method, file, log line where the log was generated.
 
-If you are interested on understanding more about the differences between the agent vs handler
-approach, I'd suggest reading `this conversation thread <https://github.com/cmanaha/python-elasticsearch-logger/issues/44/>`_
 
 The same functionality can be implemented in many other different ways. For example, consider the integration
 using `SysLogHandler <https://docs.python.org/3/library/logging.handlers.html#sysloghandler>`_ and
@@ -182,24 +238,24 @@ Contributing back
 Feel free to use this as is or even better, feel free to fork and send your pull requests over.
 
 
-.. |downloads| image:: https://img.shields.io/pypi/dd/CMRESHandler.svg
-    :target: https://pypi.python.org/pypi/CMRESHandler
+.. |downloads| image:: https://img.shields.io/pypi/dd/PYESHandler.svg
+    :target: https://pypi.python.org/pypi/PYESHandler
     :alt: Daily PyPI downloads
-.. |versions| image:: https://img.shields.io/pypi/pyversions/CMRESHandler.svg
-    :target: https://pypi.python.org/pypi/CMRESHandler
+.. |versions| image:: https://img.shields.io/pypi/pyversions/PYESHandler.svg
+    :target: https://pypi.python.org/pypi/PYESHandler
     :alt: Python versions supported
-.. |status| image:: https://img.shields.io/pypi/status/CMRESHandler.svg
-    :target: https://pypi.python.org/pypi/CMRESHandler
+.. |status| image:: https://img.shields.io/pypi/status/PYESHandler.svg
+    :target: https://pypi.python.org/pypi/PYESHandler
     :alt: Package stability
-.. |license| image:: https://img.shields.io/pypi/l/CMRESHandler.svg
-    :target: https://pypi.python.org/pypi/CMRESHandler
+.. |license| image:: https://img.shields.io/pypi/l/PYESHandler.svg
+    :target: https://pypi.python.org/pypi/PYESHandler
     :alt: License
-.. |ci_status| image:: https://travis-ci.org/cmanaha/python-elasticsearch-logger.svg?branch=master
-    :target: https://travis-ci.org/cmanaha/python-elasticsearch-logger
+.. |ci_status| image:: https://travis-ci.org/mkhadher/python-elasticsearch-logger.svg?branch=master
+    :target: https://travis-ci.org/mkhadher/python-elasticsearch-logger
     :alt: Continuous Integration Status
-.. |codecov| image:: https://codecov.io/github/cmanaha/python-elasticsearch-logger/coverage.svg?branch=master
-    :target: http://codecov.io/github/cmanaha/python-elasticsearch-logger?branch=master
+.. |codecov| image:: https://codecov.io/github/mkhadher/python-elasticsearch-logger/coverage.svg?branch=master
+    :target: http://codecov.io/github/mkhadher/python-elasticsearch-logger?branch=master
     :alt: Coverage!
 .. |gitter| image:: https://badges.gitter.im/Join%20Chat.svg
-    :target: https://gitter.im/cmanaha/python-elasticsearch-logger?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+    :target: https://gitter.im/mkhadher/python-elasticsearch-logger?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
     :alt: gitter

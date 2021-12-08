@@ -8,11 +8,11 @@ import sys
 import decimal
 
 sys.path.insert(0, os.path.abspath('.'))
-from cmreslogging.serializers import CMRESSerializer
+from pyeslogging.serializers import PYESSerializer
 
 
-class CMRESSerializerTestCase(unittest.TestCase):
-    """ CMRESSerializer test class
+class PYESSerializerTestCase(unittest.TestCase):
+    """ PYESSerializer test class
     """
 
     def setUp(self):
@@ -32,7 +32,7 @@ class CMRESSerializerTestCase(unittest.TestCase):
     def test_dumps_classic_log(self):
         """ Test the classic log serialization
         """
-        serializer = CMRESSerializer()
+        serializer = PYESSerializer()
         record = self.log.makeRecord(name=self.log.name,
                                      level=logging.INFO,
                                      fn=self.__class__.__name__,
@@ -51,7 +51,7 @@ class CMRESSerializerTestCase(unittest.TestCase):
     def test_dumps_exception_log(self):
         """ Test the exception log serialization with the exc_info field
         """
-        serializer = CMRESSerializer()
+        serializer = PYESSerializer()
         try:
             bad_idea = 1/0
         except ZeroDivisionError:
@@ -73,7 +73,7 @@ class CMRESSerializerTestCase(unittest.TestCase):
     def test_dumps_log_with_extras_and_args(self):
         """ Test the log serialization with arguments and extras complex parameters
         """
-        serializer = CMRESSerializer()
+        serializer = PYESSerializer()
         record = self.log.makeRecord(name=self.log.name,
                                      level=logging.ERROR,
                                      fn=self.__class__.__name__,

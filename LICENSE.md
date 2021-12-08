@@ -1,3 +1,7 @@
+Copyright 2021 Mohammed Mousa
+
+Forked from https://github.com/cmanaha/python-elasticsearch-logger
+
 Copyright 2016 Carlos Manzanedo Rueda
 
 Licensed under the Apache License, Version 2.0 (the "License");
