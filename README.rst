@@ -1,10 +1,10 @@
 
-===============
+==============
 PYESHandler.py
-===============
+==============
 
 |  |license| |versions| |status| |downloads|
-|  |ci_status| |codecov| |gitter|
+|  |ci_status| |codecov|
 
 
 Python Elasticsearch Log handler
@@ -111,8 +111,9 @@ The constructors takes the following parameters:
  - es_index_name: A string with the prefix of the elasticsearch index that will be created. Note a date with
    YYYY.MM.dd, ``python_logger`` used by default
  - index_name_frequency: The frequency to use as part of the index naming. Currently supports
-   PYESHandler.IndexNameFrequency.DAILY, PYESHandler.IndexNameFrequency.WEEKLY,
-   PYESHandler.IndexNameFrequency.MONTHLY, PYESHandler.IndexNameFrequency.YEARLY and PYESHandler.IndexNameFrequency.NEVER. By default the daily rotation
+   ``ElasticECSHandler.IndexNameFrequency.DAILY``, ``ElasticECSHandler.IndexNameFrequency.WEEKLY``,
+   ``ElasticECSHandler.IndexNameFrequency.MONTHLY``, ``ElasticECSHandler.IndexNameFrequency.YEARLY`` and
+   ``ElasticECSHandler.IndexNameFrequency.NEVER``. By default the daily rotation is used.
    is used
  - es_doc_type: A string with the name of the document type that will be used ``python_log`` used by default
  - es_additional_fields: A dictionary with all the additional fields that you would like to add to the logs
@@ -158,12 +159,11 @@ There is more information about how Django logging works in the
 `Django documentation <https://docs.djangoproject.com/en/1.9/topics/logging//>`_
 
 Read logging JSON Config File
-==================
-
+=============================
 The below example can be used by a flask app or any python script. This example shows how to configure logging logger for file and elasticsearch logging using logging json config file.
 
-``logging.json``
-::
+``logging.json`` ::
+
     {
        "version":1,
        "disable_existing_loggers":true,
@@ -203,8 +203,8 @@ The below example can be used by a flask app or any python script. This example 
        }
     }
 
-``app.py``
-::
+``app.py`` ::
+
     import logging
     import logging.config
     from pyeslogging.handlers import PYESHandler
@@ -250,12 +250,9 @@ Feel free to use this as is or even better, feel free to fork and send your pull
 .. |license| image:: https://img.shields.io/pypi/l/PYESHandler.svg
     :target: https://pypi.python.org/pypi/PYESHandler
     :alt: License
-.. |ci_status| image:: https://travis-ci.org/mkhadher/python-elasticsearch-logger.svg?branch=master
+.. |ci_status| image:: https://travis-ci.com/mkhadher/python-elasticsearch-logger.svg?branch=master
     :target: https://travis-ci.org/mkhadher/python-elasticsearch-logger
     :alt: Continuous Integration Status
 .. |codecov| image:: https://codecov.io/github/mkhadher/python-elasticsearch-logger/coverage.svg?branch=master
     :target: http://codecov.io/github/mkhadher/python-elasticsearch-logger?branch=master
     :alt: Coverage!
-.. |gitter| image:: https://badges.gitter.im/Join%20Chat.svg
-    :target: https://gitter.im/mkhadher/python-elasticsearch-logger?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-    :alt: gitter
